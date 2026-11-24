@@ -1,4 +1,4 @@
-interface Customer {
+export interface Customer {
     firstname: string;
     lastname: string;
     streetaddress: string;
@@ -7,8 +7,8 @@ interface Customer {
     email: string;
     phone: string;
     _links: {
-        self: string;
-        customer: string;
-        trainings: string;
+        self: { href: string };
+        customer: { href: string };
+        trainings: { href: string };
     }
 }
