@@ -21,6 +21,7 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils'*/
+import { TextField } from '@mui/material'
 
 interface Props {
     customers: Customer[]
@@ -30,6 +31,7 @@ function CustomerTable({ customers }: Props) {
 
     const [order, setOrder] = useState<'asc' | 'desc'>('asc')
     const [orderBy, setOrderBy] = useState<keyof Customer>('firstname')
+    const [search, setSearch] = useState('')
 
     const handleSort = (property: keyof Customer) => {
         const isAsc = orderBy === property && order === 'asc'
@@ -45,6 +47,20 @@ function CustomerTable({ customers }: Props) {
             : valueB.localeCompare(valueA)
     })
 
+    const filteredCustomers = sortedCustomers.filter((customer) =>
+        Object.values({
+            firstname: customer.firstname,
+            lastname: customer.lastname,
+            streetaddress: customer.streetaddress,
+            postcode: customer.postcode,
+            city: customer.city,
+            email: customer.email,
+            phone: customer.phone
+        }).some((value) =>
+            value.toLowerCase().includes(search.toLowerCase())
+        )
+    )
+
     const headCells = [
         { id: "firstname", numeric: false, disablePadding: true, label: "Firstname" },
         { id: "lastname", numeric: false, disablePadding: false, label: "Lastname" },
@@ -56,7 +72,13 @@ function CustomerTable({ customers }: Props) {
     ];
 
     return (
+
         <TableContainer component={Paper}>
+            <TextField
+                label="Search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+            />
             <Table>
                 <TableHead>
                     <TableRow>
@@ -75,7 +97,7 @@ function CustomerTable({ customers }: Props) {
                 </TableHead>
 
                 <TableBody>
-                    {sortedCustomers.map((customer) => (
+                    {filteredCustomers.map((customer) => (
                         <TableRow key={customer._links.self.href}>
                             <TableCell>{customer.firstname}</TableCell>
                             <TableCell>{customer.lastname}</TableCell>
