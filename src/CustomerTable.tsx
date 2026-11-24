@@ -1,4 +1,5 @@
 import type { Customer } from "./Customer"
+import { useState } from "react"
 /*import { alpha } from '@mui/material'
 import Box from '@mui/material/Box'*/
 import Table from '@mui/material/Table';
@@ -8,8 +9,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 //import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-/*import TableSortLabel from '@mui/material/TableSortLabel';
-import Toolbar from '@mui/material/Toolbar';
+import TableSortLabel from '@mui/material/TableSortLabel';
+/*import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography'*/
 import Paper from '@mui/material/Paper';
 /*import Checkbox from '@mui/material/Checkbox';
@@ -27,7 +28,24 @@ interface Props {
 
 function CustomerTable({ customers }: Props) {
 
-     const headCells = [
+    const [order, setOrder] = useState<'asc' | 'desc'>('asc')
+    const [orderBy, setOrderBy] = useState<keyof Customer>('firstname')
+
+    const handleSort = (property: keyof Customer) => {
+        const isAsc = orderBy === property && order === 'asc'
+        setOrder(isAsc ? 'desc' : 'asc')
+        setOrderBy(property)
+    }
+
+    const sortedCustomers = [...customers].sort((a, b) => {
+        const valueA = String(a[orderBy]).toLowerCase()
+        const valueB = String(b[orderBy]).toLowerCase()
+        return order === 'asc'
+            ? valueA.localeCompare(valueB)
+            : valueB.localeCompare(valueA)
+    })
+
+    const headCells = [
         { id: "firstname", numeric: false, disablePadding: true, label: "Firstname" },
         { id: "lastname", numeric: false, disablePadding: false, label: "Lastname" },
         { id: "streetaddress", numeric: false, disablePadding: false, label: "Street address" },
@@ -37,35 +55,41 @@ function CustomerTable({ customers }: Props) {
         { id: "phone", numeric: false, disablePadding: false, label: "Phone" },
     ];
 
-return (
-    <TableContainer component={Paper}>
-        <Table>
-            <TableHead>
-                <TableRow>
-                    {headCells.map((cell) => (
-                        <TableCell key={cell.id}>
-                            {cell.label}
-                        </TableCell>
-                    ))}
-                </TableRow>
-            </TableHead>
-
-            <TableBody>
-                {customers.map((customer) => (
-                    <TableRow key={customer._links.self.href}>
-                        <TableCell>{customer.firstname}</TableCell>
-                        <TableCell>{customer.lastname}</TableCell>
-                        <TableCell>{customer.streetaddress}</TableCell>
-                        <TableCell>{customer.postcode}</TableCell>
-                        <TableCell>{customer.city}</TableCell>
-                        <TableCell>{customer.email}</TableCell>
-                        <TableCell>{customer.phone}</TableCell>
+    return (
+        <TableContainer component={Paper}>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        {headCells.map((cell) => (
+                            <TableCell key={cell.id}>
+                                <TableSortLabel
+                                    active={orderBy === cell.id}
+                                    direction={orderBy === cell.id ? order : 'asc'}
+                                    onClick={() => handleSort(cell.id as keyof Customer)}
+                                >
+                                    {cell.label}
+                                </TableSortLabel>
+                            </TableCell>
+                        ))}
                     </TableRow>
-                ))}
-            </TableBody>
-        </Table>
-    </TableContainer>
-)
+                </TableHead>
+
+                <TableBody>
+                    {sortedCustomers.map((customer) => (
+                        <TableRow key={customer._links.self.href}>
+                            <TableCell>{customer.firstname}</TableCell>
+                            <TableCell>{customer.lastname}</TableCell>
+                            <TableCell>{customer.streetaddress}</TableCell>
+                            <TableCell>{customer.postcode}</TableCell>
+                            <TableCell>{customer.city}</TableCell>
+                            <TableCell>{customer.email}</TableCell>
+                            <TableCell>{customer.phone}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    )
 }
 
 
