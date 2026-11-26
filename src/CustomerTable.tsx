@@ -13,25 +13,25 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 /*import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography'*/
 import Paper from '@mui/material/Paper';
-/*import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { visuallyHidden } from '@mui/utils'*/
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import { TextField } from '@mui/material'
 
 interface Props {
     customers: Customer[]
+    newCustomer: Customer
+    setNewCustomer: React.Dispatch<React.SetStateAction<Customer>>
 }
 
-function CustomerTable({ customers }: Props) {
+function CustomerTable({ customers, newCustomer, setNewCustomer }: Props) {
 
     const [order, setOrder] = useState<'asc' | 'desc'>('asc')
     const [orderBy, setOrderBy] = useState<keyof Customer>('firstname')
     const [search, setSearch] = useState('')
+    const [open, setOpen] = useState(false)
 
     const handleSort = (property: keyof Customer) => {
         const isAsc = orderBy === property && order === 'asc'
@@ -73,44 +73,63 @@ function CustomerTable({ customers }: Props) {
 
     return (
 
-        <TableContainer component={Paper}>
-            <TextField
-                label="Search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-            />
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        {headCells.map((cell) => (
-                            <TableCell key={cell.id}>
-                                <TableSortLabel
-                                    active={orderBy === cell.id}
-                                    direction={orderBy === cell.id ? order : 'asc'}
-                                    onClick={() => handleSort(cell.id as keyof Customer)}
-                                >
-                                    {cell.label}
-                                </TableSortLabel>
-                            </TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
+        <>
 
-                <TableBody>
-                    {filteredCustomers.map((customer) => (
-                        <TableRow key={customer._links.self.href}>
-                            <TableCell>{customer.firstname}</TableCell>
-                            <TableCell>{customer.lastname}</TableCell>
-                            <TableCell>{customer.streetaddress}</TableCell>
-                            <TableCell>{customer.postcode}</TableCell>
-                            <TableCell>{customer.city}</TableCell>
-                            <TableCell>{customer.email}</TableCell>
-                            <TableCell>{customer.phone}</TableCell>
+            <Button onClick={() => setOpen(true)}>
+                Add customer
+            </Button>
+            <TableContainer component={Paper}>
+
+                <TextField
+                    label="Search"
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                />
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            {headCells.map((cell) => (
+                                <TableCell key={cell.id}>
+                                    <TableSortLabel
+                                        active={orderBy === cell.id}
+                                        direction={orderBy === cell.id ? order : 'asc'}
+                                        onClick={() => handleSort(cell.id as keyof Customer)}
+                                    >
+                                        {cell.label}
+                                    </TableSortLabel>
+                                </TableCell>
+                            ))}
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                    </TableHead>
+
+                    <TableBody>
+                        {filteredCustomers.map((customer) => (
+                            <TableRow key={customer._links.self.href}>
+                                <TableCell>{customer.firstname}</TableCell>
+                                <TableCell>{customer.lastname}</TableCell>
+                                <TableCell>{customer.streetaddress}</TableCell>
+                                <TableCell>{customer.postcode}</TableCell>
+                                <TableCell>{customer.city}</TableCell>
+                                <TableCell>{customer.email}</TableCell>
+                                <TableCell>{customer.phone}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <Dialog open={open} onClose={() => setOpen(false)}>
+                <TextField
+                    label="First name"
+                    value={newCustomer.firstname}
+                    onChange={(e) =>
+                        setNewCustomer({
+                            ...newCustomer,
+                            firstname: e.target.value
+                        })
+                    }
+                />
+            </Dialog>
+        </>
     )
 }
 

@@ -9,6 +9,15 @@ import { Container } from '@mui/material'
 function App() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [trainings, setTrainings] = useState<Training[]>([])
+  const [newCustomer, setNewCustomer] = useState({
+    firstname: '',
+    lastname: '',
+    streetaddress: '',
+    postcode: '',
+    city: '',
+    email: '',
+    phone: ''
+  })
 
   useEffect(() => {
     fetch("https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/")
@@ -40,12 +49,24 @@ function App() {
       })
       .catch(error => console.error("Fetch error:", error))
   })
+
+  const addCustomer = () => {
+    fetch("https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(newCustomer)
+    })
+  }
   return (
     <Container maxWidth="xl">
-      <CustomerTable customers={customers} />
+      <CustomerTable
+        customers={customers}
+        newCustomer={newCustomer}
+        setNewCustomer={setNewCustomer} />
       <TrainingTable
-        trainings={trainings}
-        customers={customers} />
+        trainings={trainings} />
     </Container>
   )
 }
