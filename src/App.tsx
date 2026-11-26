@@ -12,35 +12,42 @@ function App() {
 
   useEffect(() => {
     fetch("https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/")
-        .then(response => response.json())
-        .then(data => fetch(data._links.customers.href))
-        .then(response => response.json())
-        .then(data => {
-            console.log("Customers:", data)
-            setCustomers(data._embedded.customers)
-        })
-        .catch(error => console.error("Fetch error:", error))
-      }, [])
-  
+      .then(response => response.json())
+      .then(data => fetch(data._links.customers.href))
+      .then(response => response.json())
+      .then(data => {
+        console.log("Customer self link:", data._embedded.customers[0]._links.self)
+        setCustomers(data._embedded.customers)
+      })
+      .catch(error => console.error("Fetch error:", error))
+  }, [])
+
   useEffect(() => {
     fetch("https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/")
-        .then(response => response.json())
-        .then(data => fetch(data._links.trainings.href))
-        .then(response => response.json())
-        .then(data => {
-            console.log("Trainings:", data)
-            setTrainings(data._embedded.trainings)
-        })
-        .catch(error => console.error("Fetch error:", error))
+      .then(response => response.json())
+      .then(data => fetch(data._links.trainings.href))
+      .then(response => response.json())
+      .then(async data => {
+        const trainingsWithCustomers = await Promise.all(
+          data._embedded.trainings.map(async (training: Training) => {
+            const response = await fetch(training._links.customer.href)
+            const customer: Customer = await response.json()
+
+            return { ...training, customer }
+          })
+        )
+        setTrainings(trainingsWithCustomers)
+      })
+      .catch(error => console.error("Fetch error:", error))
   })
   return (
-  <Container maxWidth="xl">
-    <CustomerTable customers={customers} />
-    <TrainingTable 
+    <Container maxWidth="xl">
+      <CustomerTable customers={customers} />
+      <TrainingTable
         trainings={trainings}
         customers={customers} />
-  </Container>
-)
+    </Container>
+  )
 }
 
 export default App

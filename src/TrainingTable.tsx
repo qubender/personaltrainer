@@ -5,26 +5,20 @@ import type { Customer } from "./Customer"
 
 interface Props {
     trainings: Training[]
-    customers: Customer[]
 }
 
-function TrainingTable({ trainings, customers }: Props) {
+function TrainingTable({ trainings }: Props) {
 
     const columns: GridColDef<Training>[] = [
         {
             field: 'customer',
             headerName: 'Customer',
             flex: 1,
-            renderCell: (params) => {
-                
-                const customer =customers.find(
-                    (c) => c._links.self.href === params.row._links.customer.href
-                )
-
-                return customer
-                    ? `${customer.firstname} ${customer.lastname}`
+            valueGetter: (value, row) =>
+                row.customer
+                    ? `${row.customer.firstname} ${row.customer.lastname}`
                     : 'Unknown'
-            }
+
         },
         {
             field: 'date',
@@ -33,7 +27,7 @@ function TrainingTable({ trainings, customers }: Props) {
             renderCell: (params) =>
                 new Date(params.value).toLocaleString('fi-FI')
         },
-         {
+        {
             field: 'duration',
             headerName: 'Duration (min)',
             flex: 1
