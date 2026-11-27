@@ -1,17 +1,13 @@
 import type { Customer } from "./Customer"
 import { useState } from "react"
-/*import { alpha } from '@mui/material'
-import Box from '@mui/material/Box'*/
+import type { NewCustomer } from "./Customer";
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
-//import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
-/*import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography'*/
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -22,11 +18,12 @@ import { TextField } from '@mui/material'
 
 interface Props {
     customers: Customer[]
-    newCustomer: Customer
-    setNewCustomer: React.Dispatch<React.SetStateAction<Customer>>
+    newCustomer: NewCustomer
+    addCustomer: () => void
+    setNewCustomer: React.Dispatch<React.SetStateAction<NewCustomer>>
 }
 
-function CustomerTable({ customers, newCustomer, setNewCustomer }: Props) {
+function CustomerTable({ customers, newCustomer, setNewCustomer, addCustomer }: Props) {
 
     const [order, setOrder] = useState<'asc' | 'desc'>('asc')
     const [orderBy, setOrderBy] = useState<keyof Customer>('firstname')
@@ -128,6 +125,78 @@ function CustomerTable({ customers, newCustomer, setNewCustomer }: Props) {
                         })
                     }
                 />
+                <TextField
+                    label="Last name"
+                    value={newCustomer.lastname}
+                    onChange={(e) =>
+                        setNewCustomer({
+                            ...newCustomer,
+                            lastname: e.target.value
+                        })
+                    }
+                />
+                <TextField
+                    label="Street address"
+                    value={newCustomer.streetaddress}
+                    onChange={(e) =>
+                        setNewCustomer({
+                            ...newCustomer,
+                            streetaddress: e.target.value
+                        })
+                    }
+                />
+                <TextField
+                    label="Post code"
+                    value={newCustomer.postcode}
+                    onChange={(e) =>
+                        setNewCustomer({
+                            ...newCustomer,
+                            postcode: e.target.value
+                        })
+                    }
+                />
+                <TextField
+                    label="City"
+                    value={newCustomer.city}
+                    onChange={(e) =>
+                        setNewCustomer({
+                            ...newCustomer,
+                            city: e.target.value
+                        })
+                    }
+                />
+                <TextField
+                    label="Email"
+                    value={newCustomer.email}
+                    onChange={(e) =>
+                        setNewCustomer({
+                            ...newCustomer,
+                            email: e.target.value
+                        })
+                    }
+                />
+                <TextField
+                    label="Phone number"
+                    value={newCustomer.phone}
+                    onChange={(e) =>
+                        setNewCustomer({
+                            ...newCustomer,
+                            phone: e.target.value
+                        })
+                    }
+                />
+                <DialogActions>
+                    <Button onClick={() => setOpen(false)}>
+                        Cancel
+                    </Button>
+
+                    <Button onClick={async () => {
+                        await addCustomer()
+                        setOpen(false)
+                    }}>
+                        Add
+                    </Button>
+                </DialogActions>
             </Dialog>
         </>
     )

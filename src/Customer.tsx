@@ -12,3 +12,5 @@ export interface Customer {
         trainings: { href: string };
     }
 }
+
+export type NewCustomer = Omit<Customer, '_links'>

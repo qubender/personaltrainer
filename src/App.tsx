@@ -5,11 +5,12 @@ import CustomerTable from "./CustomerTable.tsx"
 import TrainingTable from './TrainingTable.tsx'
 import './App.css'
 import { Container } from '@mui/material'
+import type { NewCustomer } from './Customer'
 
 function App() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [trainings, setTrainings] = useState<Training[]>([])
-  const [newCustomer, setNewCustomer] = useState({
+  const [newCustomer, setNewCustomer] = useState<NewCustomer>({
     firstname: '',
     lastname: '',
     streetaddress: '',
@@ -50,21 +51,38 @@ function App() {
       .catch(error => console.error("Fetch error:", error))
   })
 
-  const addCustomer = () => {
-    fetch("https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(newCustomer)
-    })
+  const addCustomer = async () => {
+    try {
+      const response = await fetch(
+        "https://customer-rest-service-frontend-personaltrainer.2.rahtiapp.fi/api/customers",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(newCustomer)
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`)
+      }
+
+      const addedCustomer = await response.json()
+
+      setCustomers(prev => [...prev, addedCustomer])
+
+    } catch (error) {
+      console.error("Customer addition failed:", error)
+    }
   }
   return (
     <Container maxWidth="xl">
       <CustomerTable
         customers={customers}
         newCustomer={newCustomer}
-        setNewCustomer={setNewCustomer} />
+        setNewCustomer={setNewCustomer}
+        addCustomer={addCustomer} />
       <TrainingTable
         trainings={trainings} />
     </Container>
@@ -72,3 +90,5 @@ function App() {
 }
 
 export default App
+
+
